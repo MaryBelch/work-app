@@ -28,6 +28,11 @@ async function main() {
   const publicPath = path.join(__dirname, '..', 'public');
   app.use(express.static(publicPath));
 
+  // ===== Health Check =====
+  app.get('/health', (_req, res) => {
+    res.json({ status: 'ok', time: new Date().toISOString() });
+  });
+
   // ===== API Роуты =====
 
   // Авторизация (без JWT)
