@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: work-app
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build && cd ../backend && npm install && npm run build
+    startCommand: node backend/dist/index.js
+    healthCheckPath: /api/services
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_TELEGRAM_IDS
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
