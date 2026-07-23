@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getPurchases, createPurchase, updatePurchase, deletePurchase, getPurchaseSummary } from '../api';
+import Autocomplete from './Autocomplete';
 import type { Purchase, PurchaseSummary } from '../types';
 
 interface Props {
@@ -229,11 +230,11 @@ export default function Purchases({ type }: Props) {
 
             <div className="form-group">
               <label className="form-label">Наименование *</label>
-              <input
-                className="form-input"
-                placeholder="Например: Бумага А4 350г"
+              <Autocomplete
                 value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
+                onChange={v => setForm({ ...form, name: v })}
+                suggestions={items.map(i => i.name).filter((v, idx, a) => a.indexOf(v) === idx)}
+                placeholder="Например: Бумага А4 350г"
               />
             </div>
 

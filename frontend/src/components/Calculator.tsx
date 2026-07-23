@@ -3,6 +3,7 @@ import {
   getServices, createOrder, getOrders, deleteOrder, calculatePrice, getUser,
   getPurchases, getPurchaseSummary
 } from '../api';
+import Autocomplete from './Autocomplete';
 import type { Service, Order, CalculationResult, Purchase, PurchaseSummary } from '../types';
 
 interface MaterialUsage {
@@ -42,7 +43,6 @@ export default function Calculator() {
 
   // Клиенты для автодополнения
   const [recentClients, setRecentClients] = useState<string[]>([]);
-  const [showClients, setShowClients] = useState(false);
 
   const loadData = async () => {
     try {
@@ -232,11 +232,6 @@ export default function Calculator() {
     }
   };
 
-  const handleSelectClient = (name: string) => {
-    setClientName(name);
-    setShowClients(false);
-  };
-
   const selectedService = services.find(s => s.id === Number(serviceId));
   const profit = result ? (Number(receivedAmount) || result.total) - totalCostPrice : 0;
 
@@ -250,45 +245,14 @@ export default function Calculator() {
 
       {/* Форма заказа */}
       <div className="card">
-        <div className="form-group" style={{ position: 'relative' }}>
+        <div className="form-group">
           <label className="form-label">Имя клиента</label>
-          <input
-            className="form-input"
-            placeholder="Введите имя"
+          <Autocomplete
             value={clientName}
-            onChange={e => {
-              setClientName(e.target.value);
-              setShowClients(true);
-            }}
-            onFocus={() => setShowClients(true)}
-            onBlur={() => setTimeout(() => setShowClients(false), 200)}
+            onChange={setClientName}
+            suggestions={recentClients}
+            placeholder="Введите имя"
           />
-          {showClients && recentClients.length > 0 && clientName && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              background: 'var(--tg-section-bg)',
-              border: '1px solid rgba(0,0,0,0.1)',
-              borderRadius: 8,
-              zIndex: 10,
-              maxHeight: 150,
-              overflowY: 'auto',
-            }}>
-              {recentClients
-                .filter(c => c.toLowerCase().includes(clientName.toLowerCase()))
-                .map(c => (
-                  <div
-                    key={c}
-                    style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 14 }}
-                    onMouseDown={() => handleSelectClient(c)}
-                  >
-                    {c}
-                  </div>
-                ))}
-            </div>
-          )}
         </div>
 
         <div className="form-group">

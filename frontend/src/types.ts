@@ -72,6 +72,23 @@ export interface UserInfo {
   name: string;
 }
 
+export interface Equipment {
+  id: number;
+  name: string;
+  purchase_price: number;
+  quantity: number;
+  notes: string;
+  created_at: string;
+}
+
+export interface RecoupmentSummary {
+  total_equipment_cost: number;
+  total_profit: number;
+  remaining_to_recoup: number;
+  recouped_percent: number;
+  is_recouped: boolean;
+}
+
 export interface CalculationResult {
   unitPrice: number;
   designCost: number;

@@ -1,4 +1,4 @@
-import { Service, Order, Material, UserInfo, CalculationResult, Purchase, PurchaseSummary, OrderMaterial } from './types';
+import { Service, Order, Material, UserInfo, CalculationResult, Purchase, PurchaseSummary, OrderMaterial, Equipment, RecoupmentSummary } from './types';
 
 const API_BASE = '/api';
 const PACKAGING_PRICE = 25;
@@ -176,6 +176,32 @@ export function calculatePrice(
     total: Math.round(total * 100) / 100,
     discountPercent,
   };
+}
+
+// === Equipment ===
+export async function getEquipment(): Promise<Equipment[]> {
+  return request<Equipment[]>('GET', '/equipment');
+}
+
+export async function getRecoupment(): Promise<RecoupmentSummary> {
+  return request<RecoupmentSummary>('GET', '/equipment/recoupment');
+}
+
+export async function createEquipment(data: {
+  name: string;
+  purchase_price: number;
+  quantity?: number;
+  notes?: string;
+}): Promise<Equipment> {
+  return request<Equipment>('POST', '/equipment', data);
+}
+
+export async function updateEquipment(id: number, data: Partial<Equipment>): Promise<Equipment> {
+  return request<Equipment>('PUT', `/equipment/${id}`, data);
+}
+
+export async function deleteEquipment(id: number): Promise<void> {
+  return request<void>('DELETE', `/equipment/${id}`);
 }
 
 export { PACKAGING_PRICE };

@@ -100,6 +100,16 @@ export async function initDatabase(): Promise<void> {
       created_at TEXT DEFAULT (datetime('now')),
       FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
     );
+
+    -- Обладнання (принтер, резак тощо) — разові витрати для окупності
+    CREATE TABLE IF NOT EXISTS equipment (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      purchase_price REAL NOT NULL DEFAULT 0,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 
   // Миграция: добавляем колонки cost_price и received_amount, если их нет

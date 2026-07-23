@@ -9,6 +9,7 @@ import servicesRouter from './routes/services';
 import ordersRouter from './routes/orders';
 import materialsRouter from './routes/materials';
 import purchasesRouter from './routes/purchases';
+import equipmentRouter from './routes/equipment';
 
 async function main() {
   // Инициализация БД
@@ -44,6 +45,7 @@ async function main() {
   app.use('/api/orders', authMiddleware, ordersRouter);
   app.use('/api/materials', authMiddleware, materialsRouter);
   app.use('/api/purchases', authMiddleware, purchasesRouter);
+app.use('/api/equipment', authMiddleware, equipmentRouter);
 
   // ===== Bot Webhook Handler =====
   const bot = getBot();

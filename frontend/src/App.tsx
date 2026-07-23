@@ -3,15 +3,17 @@ import { login, getToken, setToken, setUser, getUser } from './api';
 import Services from './components/Services';
 import Calculator from './components/Calculator';
 import Purchases from './components/Purchases';
+import Equipment from './components/Equipment';
 import type { UserInfo } from './types';
 
-type TabKey = 'services' | 'calculator' | 'purchases-poly' | 'purchases-epoxy';
+type TabKey = 'services' | 'calculator' | 'purchases-poly' | 'purchases-epoxy' | 'equipment';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'services', label: 'Услуги', icon: '📋' },
   { key: 'calculator', label: 'Калькулятор', icon: '🧮' },
   { key: 'purchases-poly', label: 'Закупки(полигр)', icon: '📦' },
   { key: 'purchases-epoxy', label: 'Закупки(эпокси)', icon: '🧪' },
+  { key: 'equipment', label: 'Обладнання', icon: '🖨️' },
 ];
 
 // Объявляем тип Telegram WebApp
@@ -41,6 +43,14 @@ declare global {
         };
         setHeaderColor: (color: string) => void;
         setBackgroundColor: (color: string) => void;
+        contentSafeAreaInset?: {
+          top: number;
+          bottom: number;
+          left: number;
+          right: number;
+        };
+        onEvent: (event: string, callback: () => void) => void;
+        offEvent: (event: string, callback: () => void) => void;
       };
     };
   }
@@ -114,11 +124,48 @@ export default function App() {
     authenticate();
   }, [getTelegramInitData]);
 
-  // Отображаем нижнюю панель Telegram в продакшене
+  // Отображаем нижнюю панель Telegram в продакшене + safe area insets
   useEffect(() => {
     if (authState === 'authenticated') {
-      window.Telegram?.WebApp?.ready();
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+
+        // Применяем safe area insets от Telegram (для Desktop window controls)
+        const insets = tg.contentSafeAreaInset;
+        if (insets) {
+          const root = document.documentElement;
+          root.style.setProperty('--tg-safe-top', `${insets.top}px`);
+          root.style.setProperty('--tg-safe-bottom', `${insets.bottom}px`);
+          root.style.setProperty('--tg-safe-left', `${insets.left}px`);
+          root.style.setProperty('--tg-safe-right', `${insets.right}px`);
+        }
+      }
     }
+  }, [authState]);
+
+  // Слушаем изменения viewport (Telegram Desktop меняет размер окна)
+  useEffect(() => {
+    if (authState !== 'authenticated') return;
+    const tg = window.Telegram?.WebApp;
+    if (!tg) return;
+
+    const handleViewport = () => {
+      const insets = tg.contentSafeAreaInset;
+      if (insets) {
+        const root = document.documentElement;
+        root.style.setProperty('--tg-safe-top', `${insets.top}px`);
+        root.style.setProperty('--tg-safe-bottom', `${insets.bottom}px`);
+        root.style.setProperty('--tg-safe-left', `${insets.left}px`);
+        root.style.setProperty('--tg-safe-right', `${insets.right}px`);
+      }
+    };
+
+    // Telegram вызывает viewportChange при изменении размеров
+    tg.onEvent('viewportChanged', handleViewport);
+    return () => {
+      tg.offEvent('viewportChanged', handleViewport);
+    };
   }, [authState]);
 
   if (authState === 'loading') {
@@ -173,6 +220,7 @@ export default function App() {
         {activeTab === 'calculator' && <Calculator />}
         {activeTab === 'purchases-poly' && <Purchases type="poligraphy" />}
         {activeTab === 'purchases-epoxy' && <Purchases type="epoxy" />}
+        {activeTab === 'equipment' && <Equipment />}
       </div>
 
       <div className="tab-bar">
