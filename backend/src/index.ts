@@ -5,6 +5,7 @@ import path from 'path';
 import { initDatabase } from './database';
 import { initializeBot, startBot, getBot } from './bot';
 import { loginHandler, meHandler, authMiddleware } from './middleware/auth';
+import { exportHandler, csvExportHandler } from './routes/export';
 import servicesRouter from './routes/services';
 import ordersRouter from './routes/orders';
 import materialsRouter from './routes/materials';
@@ -46,6 +47,10 @@ async function main() {
   app.use('/api/materials', authMiddleware, materialsRouter);
   app.use('/api/purchases', authMiddleware, purchasesRouter);
 app.use('/api/equipment', authMiddleware, equipmentRouter);
+
+  // ===== Export (backup all data) =====
+  app.get('/api/export', authMiddleware, exportHandler);
+app.get('/api/export/csv', authMiddleware, csvExportHandler);
 
   // ===== Bot Webhook Handler =====
   const bot = getBot();

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getEquipment, getRecoupment, createEquipment, deleteEquipment } from '../api';
+import { getEquipment, getRecoupment, createEquipment, deleteEquipment, exportDataCsv } from '../api';
 import type { Equipment as EquipmentItem, RecoupmentSummary } from '../types';
 
 export default function Equipment() {
@@ -131,6 +131,19 @@ export default function Equipment() {
       )}
 
       {/* Список обладнання */}
+      {/* Кнопка экспорта */}
+      <div className="card" style={{ marginTop: 12, background: 'var(--tg-secondary-bg)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>💾 Бекап даних</div>
+            <div className="text-muted text-sm">Завантажити всі дані (CSV для Excel)</div>
+          </div>
+          <button className="btn btn-primary btn-sm" style={{ width: 'auto', padding: '8px 16px' }} onClick={exportDataCsv}>
+            ⬇️ Експорт
+          </button>
+        </div>
+      </div>
+
       {items.length === 0 && !showForm && (
         <div className="empty-state">
           <div className="empty-icon">🖨️</div>

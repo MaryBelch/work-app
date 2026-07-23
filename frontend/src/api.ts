@@ -204,4 +204,31 @@ export async function deleteEquipment(id: number): Promise<void> {
   return request<void>('DELETE', `/equipment/${id}`);
 }
 
+// === Export / Backup ===
+export async function exportDataJson(): Promise<Blob> {
+  const response = await fetch(`${API_BASE}/export`, {
+    headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+  });
+  if (!response.ok) throw new Error('Ошибка экспорта');
+  return response.blob();
+}
+
+export function exportDataCsv() {
+  // Открываем в новом окне — браузер скачает файл
+  const url = `${API_BASE}/export/csv`;
+  // Создаем скрытую ссылку с авторизацией
+  fetch(url, {
+    headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+  })
+    .then(res => res.blob())
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `work-app-backup-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    })
+    .catch(err => console.error('Export error:', err));
+}
+
 export { PACKAGING_PRICE };
